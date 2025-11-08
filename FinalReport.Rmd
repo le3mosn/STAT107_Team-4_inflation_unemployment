@@ -8,7 +8,10 @@ fontsize: 11pt
 geometry: margin=1in
 ---
 # Abstract
-The goal of this project is to show correlations between inflation rates and unemployment rates. Currently, preliminary analysis shows an expected positive correlation between inflation rates and unemployment rates. There has been extensive research done on the relationship between the inflation rates of a nation and its employment rate. This takes mainly in the study of the Phillips curve, this describes the inverse relationship between inflation and unemployment rates. Stating that there is the short-run curve as well as a long-run curve. The purpose of this project is to see how inflation, and other similar measures of economic health, influence employment both globally and within the United States. We intend to show how specific demographics can be affected by inflation, as well as showing patterns in previous recessions. Furthermore, we will run our own analysis to see if we can achieve similar results to the Phillip's Curve.
+The goal of this project is to show correlations between inflation rates and unemployment rates. Currently, preliminary analysis shows an expected positive correlation between inflation rates and unemployment rates. There has been extensive research done on the relationship between the inflation rates of a nation and its employment rate. This takes mainly in the study of the Phillips curve, this describes the inverse relationship between inflation and unemployment rates. Stating that there is the short-run curve as well as a long-run curve. 
+
+## Intro
+The purpose of this project is to see how inflation, and other similar measures of economic health, influence employment both globally and within the United States. We intend to show how specific demographics can be affected by inflation, as well as showing patterns in previous recessions. Furthermore, we will run our own analysis to see if we can achieve similar results to the Phillip's Curve.
 
 ## Data
 This project's data was pulled from the data catalogs of the World Bank Group and the Federal Reserve Bank of St. Louis. Most are simple 2 variable lists of the recorded data and the time it was collected, allowing us to use multiple sets of data. As this data was collected from a reliable source, it needed minimal cleaning aside from some reformatting and removal of extraneous labels.
@@ -45,3 +48,4 @@ ggplot(wb_data, aes(Inflation, Unemployment)) +
 
 # Analysis
 We will use a combination of visual and descriptive statics revolving around unemployment and educational degrees, pertaining around various economic periods. These include the 2008 recession as well as current economic times. Primarily taking focus on the employment rate recovery and determining whether inflation increases or decreases.  
+
