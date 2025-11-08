@@ -1,0 +1,47 @@
+---
+title: "Correlation between Inflation and Unemployment"
+author: "Edison, Yamato, Vincent"
+output:
+  pdf_document:
+    number_sections: yes
+fontsize: 11pt
+geometry: margin=1in
+---
+# Abstract
+The goal of this project is to show correlations between inflation rates and unemployment rates. Currently, preliminary analysis shows an expected positive correlation between inflation rates and unemployment rates. There has been extensive research done on the relationship between the inflation rates of a nation and its employment rate. This takes mainly in the study of the Phillips curve, this describes the inverse relationship between inflation and unemployment rates. Stating that there is the short-run curve as well as a long-run curve. The purpose of this project is to see how inflation, and other similar measures of economic health, influence employment both globally and within the United States. We intend to show how specific demographics can be affected by inflation, as well as showing patterns in previous recessions. Furthermore, we will run our own analysis to see if we can achieve similar results to the Phillip's Curve.
+
+## Data
+This project's data was pulled from the data catalogs of the World Bank Group and the Federal Reserve Bank of St. Louis. Most are simple 2 variable lists of the recorded data and the time it was collected, allowing us to use multiple sets of data. As this data was collected from a reliable source, it needed minimal cleaning aside from some reformatting and removal of extraneous labels.
+
+## Visualizations 
+These early visualizations indicate a positive relationship between inflation and unemployment, which is to be expected.
+
+The negative correlation between breakeven inflation is expected. Breakeven inflation is calculated by subtracting the nominal yield (the gross amount of money gained from interest) by real yield (same as nominal, except with inflation accounted for, to find the value of that money). Increasing breakeven inflation would mean that real yield has decreased, meaning that the value of money has decreased, indicating an increase in inflation.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+source("Scripts/00_requirements.R")
+source("Scripts/01_data_load.R")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+source("scripts/11_Breakev_Inf_By_Unem.R")
+cor.test(fred_data$Inflation, fred_data$Unemployment, use = "complete.obs")
+ggplot(fred_data, aes(Inflation, Unemployment)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "USA: 10Y Breakeven Inflation vs Unemployment (FRED annualized)",
+       x = "10Y Breakeven Inflation (%)", y = "Unemployment (%)")
+
+# World Bank
+source("scripts/12_CPI_By_Unem.R")
+cor.test(wb_data$Inflation, wb_data$Unemployment, use = "complete.obs")
+ggplot(wb_data, aes(Inflation, Unemployment)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "USA: CPI Inflation vs Unemployment (World Bank annual)",
+       x = "Inflation (%)", y = "Unemployment (%)")
+```
+
+# Analysis
+We will use a combination of visual and descriptive statics revolving around unemployment and educational degrees, pertaining around various economic periods. These include the 2008 recession as well as current economic times. Primarily taking focus on the employment rate recovery and determining whether inflation increases or decreases.  
