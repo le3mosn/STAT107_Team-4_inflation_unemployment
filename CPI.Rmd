@@ -7,7 +7,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 source("Scripts/00_requirements.R")
 source("Scripts/01_data_load.R")
-library(modelsummary)
 ```
 # With CPI against Unemployment rate 
 The two purposes of this comparison was to see if there was a relationship between CPI and unemployment rates, and to see if education level caused different unemployment rates during economic crises.  
@@ -96,16 +95,16 @@ summary(min_max_BS)
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 par(mfrow=c(2,2))
 plot(min_max_BS)
 ```
 # Differences between High school and Bachelor's degrees
 
 The second part of this was to see if the unemployment rate of the two education levels had any significant difference between one another, specifically during economic crises. For this, we used a two sided t-test with the time periods of 2001 and 2008. 
-With the standard P-value of 0.05, there is a significant difference between these two, but the amount is minuscule, with the bachelor's level having a barely smaller relative unemployment rate. 
+With the standard P-value of 0.05, there is a significant difference between these two, but the amount is minuscule, with the bachelor's level having a barely smaller relative unemployment rate of 0.035.
 
-```{r}
+```{r, echo=FALSE}
 test <- c(109:120, 193:211) # specifically 2001 and 2008
 t.test(min_max_unem[test, ]$BS_unem, min_max_unem[test, ]$HS_unem, paired = TRUE)
 ```
