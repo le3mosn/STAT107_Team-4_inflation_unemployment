@@ -63,7 +63,7 @@ ggplot(merged_sets, aes(x = Year)) +
   labs(title = "Fred Vs World Bank Unemployment Rates", x = "Year", y = "Unemployment Rates")
 
 ```
-
+```{r,  echo = FALSE, warning = FALSE}
 
 ## Here I am obtaining and graphing the log transformations of Fred's unemployment rates and inflation rates 
 ## The log transformation first will aid us in handling with variance as well as brings out any linear relationships better.
@@ -93,5 +93,6 @@ ggplot(log_fred_data, aes(x = log_fred_unem, y = log_fred_infl))+
 
 # Analysis
 We will use a combination of visual and descriptive statics revolving around unemployment and educational degrees, pertaining around various economic periods. These include the 2008 recession as well as current economic times. Primarily taking focus on the employment rate recovery and determining whether inflation increases or decreases.  
+
 
 
