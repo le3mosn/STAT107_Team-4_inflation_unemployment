@@ -9,10 +9,11 @@ output:
 fontsize: 11pt
 geometry: margin=1in
 ---
-## Abstract
+Abstract
+
 This project examines whether there is a statistically significant relationship between inflation and unemployment and to what extent recent data resemble a Phillips-curve-type trade-off. We combine two publicly available data sources: FRED series on U.S. unemployment and 10-year breakeven inflation, and World Bank annual data on CPI inflation and unemployment. Using scatterplots, time-series plots, Pearson correlation tests, and a log–log regression, we assess both the direction and strength of the association. For the FRED data, we find a strong and statistically significant negative correlation between expected inflation and unemployment, consistent with a downward-sloping short-run Phillips curve. In contrast, for the World Bank series, the estimated correlation between CPI inflation and unemployment is close to zero and not statistically significant, and the corresponding scatterplot shows no clear slope. The log–log regression confirms a significant but quantitatively modest relationship, with unemployment explaining only a small share of the variation in inflation. Overall, our results suggest that Phillips-curve-like patterns can be visible in some short-run, country-specific data, but they are much weaker in longer-run data, highlighting the limits of interpreting the Phillips curve as a stable structural relationship.
 
-## Intro
+Intro
 
 Inflation and unemployment are two central indicators of macroeconomic performance and play a key role in monetary and fiscal policy decisions. Since the original work of A. W. Phillips, economists have debated whether there is a stable trade-off between these two variables—the so-called Phillips curve—or whether any apparent relationship is only a short-run phenomenon that can disappear over time or across different institutional settings. Understanding how inflation and unemployment comove in recent data is therefore important not only for academic discussions, but also for policy makers and the general public who are concerned with price stability and labor-market conditions.
 
@@ -20,7 +21,7 @@ In this project, we focus on a simple but concrete question: Is there a statisti
 
 Our analysis combines descriptive visualizations with formal statistical tools. We begin with scatterplots and time-series plots to build intuition about the direction and strength of the association between inflation and unemployment. We then conduct Pearson correlation tests and estimate a log–log regression model to quantify this relationship and evaluate its statistical significance. This approach allows us to compare our empirical findings with the traditional and modern interpretations of the Phillips curve and to discuss in what sense the trade-off between inflation and unemployment is visible in the data and where its limitations lie.
 
-## Data
+Data
 
 Our empirical analysis is based on publicly available macroeconomic data from two primary sources: the Federal Reserve Economic Data (FRED) database and the World Bank's World Development Indicators. Both sources provide annual data series on U.S. inflation and unemployment. Using multiple datasets for the same concepts helps us verify the consistency of data across different sources and test the sensitivity of our results to different measures of inflation and sample periods.
 
@@ -30,7 +31,7 @@ From the World Bank's World Development Indicators, we obtain U.S. annual Consum
 
 Before conducting the analysis, we perform a series of basic cleaning and calibration steps. For each pair of variables, we merge the series by year and remove observations with missing values for inflation or unemployment. For FRED data, this leaves only a small number of recent annual observations, which limits the precision and generalizability of our estimates. For the longer World Bank sample, we also apply log transformations to inflation and unemployment rates to estimate a log-log regression model, allowing us to interpret slope coefficients as elasticities. Overall, our cleaning process generates two primary datasets: a shorter FRED sample with expected inflation and a longer World Bank sample with actual CPI inflation, which together form the basis for the visualizations and econometric analyses in the following chapters.
 
-## Visualizations
+Visualizations
 
 In this section, we use four visualizations to explore how inflation and unemployment are related in our data and to assess whether a Phillips-curve-like pattern appears. Figures 1 and 2 present scatterplots of unemployment against inflation for the United States using two different sources: 10-year breakeven inflation from FRED and CPI inflation from the World Bank. These plots allow us to visually inspect both the strength and direction of the correlation, and they already suggest that the short-run FRED data display a much stronger inverse relationship than the longer-run World Bank series. Figure 3 compares unemployment rates from FRED and the World Bank over time, showing that the two data sources track each other closely and that spikes in unemployment tend to coincide across series, which supports the reliability of our measurements. Finally, Figure 4 plots log-transformed unemployment and inflation together with a fitted regression line, helping us evaluate the approximate linearity of the relationship, reduce the influence of extreme values, and connect our visual impressions to the formal regression model that we discuss in the analysis section.
 ```{r setup, include=FALSE}
@@ -108,7 +109,7 @@ ggplot(log_fred_data, aes(x = log_fred_unem, y = log_fred_infl))+
 Figure 4 displays a scatterplot of log unemployment against log inflation using the FRED data, together with a fitted regression line. After the log transformation, the points are more evenly spread out, and the linear trend becomes easier to see compared with the raw-scale plot. The fitted line slopes upward, which visually confirms a systematic relationship between unemployment and inflation in these data and reduces the influence of extreme values, providing a clearer graphical link to the log–log regression model that we discuss in the analysis section.
 
 
-## Analysis
+Analysis
 
 We begin our analysis by formally testing whether inflation and unemployment are statistically correlated in our two main datasets. For the FRED data, which combine U.S. unemployment with 10-year breakeven inflation, a Pearson correlation test yields a correlation of about −0.87 with a p-value of approximately 0.02 and a 95% confidence interval that does not include zero. This result confirms what we saw in Figure 1: over the sample used in our project, periods with higher expected inflation tend to coincide with lower unemployment, and this inverse relationship is both strong in magnitude and statistically significant at conventional levels. In other words, the short-run U.S. data we analyze are consistent with the idea that there is a meaningful trade-off between inflation and unemployment.
 
@@ -118,7 +119,7 @@ To move beyond simple correlations, we also estimate a log–log regression mode
 
 Finally, by examining the unemployment series from FRED and the World Bank over time, we see that spikes in unemployment tend to occur around major macroeconomic events such as recessions. The fact that both data sources track each other closely over these episodes, as shown in Figure 3, supports the reliability of our unemployment measures and suggests that the differences in our results are driven more by the inflation series than by inconsistencies in unemployment data. At the same time, these time plots also suggest that the relationship between inflation and unemployment may vary across periods, for example between crisis and non-crisis years. While we do not formally estimate a time-varying model in this project, our findings are consistent with the modern view that a Phillips-curve-like trade-off can be visible in certain short-run windows but is not a stable, long-run structural relationship.
 
-##Conclusions
+Conclusions
 
 In this project, we investigated the relationship between inflation and unemployment using two different data sources and several simple statistical tools. Our main goal was to see whether the empirical patterns in recent data resemble the short-run Phillips curve, which predicts an inverse relationship between inflation and unemployment.
 
