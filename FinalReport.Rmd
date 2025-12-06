@@ -3,12 +3,13 @@ title: "Correlation between Inflation and Unemployment"
 author: ' Edison Jiang, Vincent Chau, Yamato Lchii'
 date: "2025/11/07"
 output:
-  word_document: default
   pdf_document:
     number_sections: true
+  word_document: default
 fontsize: 11pt
 geometry: margin=1in
 ---
+
 Abstract
 
 This project examines whether there is a statistically significant relationship between inflation and unemployment and to what extent recent data resemble a Phillips-curve-type trade-off. We combine two publicly available data sources: FRED series on U.S. unemployment and 10-year breakeven inflation, and World Bank annual data on CPI inflation and unemployment. Using scatterplots, time-series plots, Pearson correlation tests, and a log–log regression, we assess both the direction and strength of the association. For the FRED data, we find a strong and statistically significant negative correlation between expected inflation and unemployment, consistent with a downward-sloping short-run Phillips curve. In contrast, for the World Bank series, the estimated correlation between CPI inflation and unemployment is close to zero and not statistically significant, and the corresponding scatterplot shows no clear slope. The log–log regression confirms a significant but quantitatively modest relationship, with unemployment explaining only a small share of the variation in inflation. Overall, our results suggest that Phillips-curve-like patterns can be visible in some short-run, country-specific data, but they are much weaker in longer-run data, highlighting the limits of interpreting the Phillips curve as a stable structural relationship.
@@ -25,7 +26,7 @@ Data
 
 Our empirical analysis is based on publicly available macroeconomic data from two primary sources: the Federal Reserve Economic Data (FRED) database and the World Bank's World Development Indicators. Both sources provide annual data series on U.S. inflation and unemployment. Using multiple datasets for the same concepts helps us verify the consistency of data across different sources and test the sensitivity of our results to different measures of inflation and sample periods.
 
-From the FRED database, we use the 10-year breakeven inflation rate and the nonfarm unemployment rate. The 10-year breakeven inflation rate is calculated as the yield difference between nominal U.S. Treasury bonds and Treasury Inflation-Protected Securities (TIPS) and is commonly used as a measure of the expected inflation rate over the next decade. The nonfarm unemployment rate measures the percentage of the labor force that is unemployed and actively seeking work. Since the original FRED data are provided at a monthly frequency, we convert them to annual data by taking simple yearly averages. Our sample includes all years for which both series are available, but in recent periods, there are relatively few observations per year.
+From the FRED database, we use the 10-year breakeven inflation rate, the nonfarm unemployment rate, a sticky CPI and unemployment rates for high school graduates and bachelor's degree holders. The 10-year breakeven inflation rate is calculated as the yield difference between nominal U.S. Treasury bonds and Treasury Inflation-Protected Securities (TIPS) and is commonly used as a measure of the expected inflation rate over the next decade. The nonfarm unemployment rate measures the percentage of the labor force that is unemployed and actively seeking work. Since the original FRED data are provided at a monthly frequency, we convert them to annual data by taking simple yearly averages. Our sample includes all years for which both series are available, but in recent periods, there are relatively few observations per year. The 'Sticky' CPI is calculated with items that change price slowly, like insurance rates and housing costs.
 
 From the World Bank's World Development Indicators, we obtain U.S. annual Consumer Price Index (CPI) inflation rates and total unemployment rates. CPI inflation represents the percentage change in the consumer price index for all goods and services, while the unemployment rate measures the proportion of the labor force that is without work but able and actively looking for a job. These data series cover several decades, providing a longer historical record than breakeven inflation data. We focus only on the years for which both CPI inflation and unemployment rates are available, resulting in a balanced annual dataset with several dozen observations.
 
@@ -33,7 +34,8 @@ Before conducting the analysis, we perform a series of basic cleaning and calibr
 
 Visualizations
 
-In this section, we use four visualizations to explore how inflation and unemployment are related in our data and to assess whether a Phillips-curve-like pattern appears. Figures 1 and 2 present scatterplots of unemployment against inflation for the United States using two different sources: 10-year breakeven inflation from FRED and CPI inflation from the World Bank. These plots allow us to visually inspect both the strength and direction of the correlation, and they already suggest that the short-run FRED data display a much stronger inverse relationship than the longer-run World Bank series. Figure 3 compares unemployment rates from FRED and the World Bank over time, showing that the two data sources track each other closely and that spikes in unemployment tend to coincide across series, which supports the reliability of our measurements. Finally, Figure 4 plots log-transformed unemployment and inflation together with a fitted regression line, helping us evaluate the approximate linearity of the relationship, reduce the influence of extreme values, and connect our visual impressions to the formal regression model that we discuss in the analysis section.
+In this section, we use visualizations to explore how inflation and unemployment are related in our data and to assess whether a Phillips-curve-like pattern appears. Figures 1 and 2 present scatterplots of unemployment against inflation for the United States using two different sources: 10-year breakeven inflation from FRED and CPI inflation from the World Bank. These plots allow us to visually inspect both the strength and direction of the correlation, and they already suggest that the short-run FRED data display a much stronger inverse relationship than the longer-run World Bank series. Figure 3 compares unemployment rates from FRED and the World Bank over time, showing that the two data sources track each other closely and that spikes in unemployment tend to coincide across series, which supports the reliability of our measurements. Figure 4 plots log-transformed unemployment and inflation together with a fitted regression line, helping us evaluate the approximate linearity of the relationship, reduce the influence of extreme values, and connect our visual impressions to the formal regression model that we discuss in the analysis section.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 source("Scripts/00_requirements.R")
@@ -58,11 +60,10 @@ ggplot(wb_data, aes(Inflation, Unemployment)) +
   labs(title = "USA: CPI Inflation vs Unemployment (World Bank annual)",
        x = "Inflation (%)", y = "Unemployment (%)")
 ```
+
 Figure 1 plots the U.S. unemployment rate against 10-year breakeven inflation using annualized data from FRED. The points form a clearly downward-sloping cloud, indicating that higher expected inflation tends to be associated with lower unemployment over this sample. This visual pattern is consistent with a short-run Phillips-curve-type relationship: when labor markets are tighter and unemployment is low, inflation expectations are generally higher, whereas periods of high unemployment tend to coincide with lower expected inflation.
 
 Figure 2 shows a scatterplot of the unemployment rate versus CPI inflation using annual data from the World Bank. In contrast to Figure 1, the points here are much more dispersed and do not line up along a clear upward or downward slope, suggesting that the relationship between inflation and unemployment is weak in this longer-run, international data set. Visually, the cloud of points is almost horizontal, which is consistent with the small and statistically insignificant correlation we report later in the analysis section.
-
-
 
 ```{r, echo = FALSE, warning = FALSE}
 
@@ -77,6 +78,7 @@ ggplot(merged_sets, aes(x = Year)) +
   labs(title = "Fred Vs World Bank Unemployment Rates", x = "Year", y = "Unemployment Rates")
 
 ```
+
 Figure 3 compares unemployment rates from FRED and the World Bank over time. The two lines track each other closely: peaks and troughs in unemployment appear at roughly the same dates in both series, and the overall trends are very similar. This visual agreement suggests that, despite differences in data construction and reporting, the two sources provide consistent measures of U.S. unemployment, which increases our confidence that any differences we find in the inflation–unemployment relationship are driven by the inflation measures rather than by inconsistent unemployment data.
 
 ```{r,  echo = FALSE, warning = FALSE}
@@ -106,25 +108,125 @@ ggplot(log_fred_data, aes(x = log_fred_unem, y = log_fred_infl))+
 
 
 ```
+
 Figure 4 displays a scatterplot of log unemployment against log inflation using the FRED data, together with a fitted regression line. After the log transformation, the points are more evenly spread out, and the linear trend becomes easier to see compared with the raw-scale plot. The fitted line slopes upward, which visually confirms a systematic relationship between unemployment and inflation in these data and reduces the influence of extreme values, providing a clearer graphical link to the log–log regression model that we discuss in the analysis section.
 
+```{r}
+
+source("Scripts/21_CPI_Unem_Loading.R")
+
+ggplot(data = unem_percent, aes(x = observation_date)) +
+  geom_line(aes(y = BS_unem, colour = "BS Degree and up")) +
+  geom_line(aes(y = HS_unem, colour = "HS Degree and up")) +
+  geom_line(aes(y = CPI_sticky, colour = "CPI, % change from last year")) +
+  ylim(0,20) +
+  labs(x = "Observation Date",
+       y = "",
+       caption = "Note the changes in CPI during spikes of unemloyment.",
+       color = "",
+       title = "Unemployment by Education level & Yearly Percent Change of CPI") +
+  theme( plot.caption = element_text(hjust = 0.5))
+
+```
+
+Figure 5 shows the unemployment rates of people, separated by their highest educational degree obtained, split into high school degrees and bachelors and up. The CPI used here is in percent change from the previous year, rather than the its raw value. Due to the natural rate of inflation, the CPI constantly increases. Using yearly percent change makes it easier to spot significant changes in the value of the CPI. 
 
 Analysis
 
-We begin our analysis by formally testing whether inflation and unemployment are statistically correlated in our two main datasets. For the FRED data, which combine U.S. unemployment with 10-year breakeven inflation, a Pearson correlation test yields a correlation of about −0.87 with a p-value of approximately 0.02 and a 95% confidence interval that does not include zero. This result confirms what we saw in Figure 1: over the sample used in our project, periods with higher expected inflation tend to coincide with lower unemployment, and this inverse relationship is both strong in magnitude and statistically significant at conventional levels. In other words, the short-run U.S. data we analyze are consistent with the idea that there is a meaningful trade-off between inflation and unemployment.
+We begin our analysis by formally testing whether inflation and unemployment are statistically correlated in our two main datasets. For the FRED data, which combine U.S. unemployment with 10-year breakeven inflation, a Pearson correlation test yields a correlation of about -0.87 with a p-value of approximately 0.02 and a 95% confidence interval that does not include zero. This result confirms what we saw in Figure 1: over the sample used in our project, periods with higher expected inflation tend to coincide with lower unemployment, and this inverse relationship is both strong in magnitude and statistically significant at conventional levels. In other words, the short-run U.S. data we analyze are consistent with the idea that there is a meaningful trade-off between inflation and unemployment.
 
 In contrast, when we repeat the same correlation test using the World Bank data on CPI inflation and unemployment, the results look very different. The estimated correlation is only about 0.08, and the associated p-value is around 0.51, with a confidence interval that comfortably includes zero. This implies that, in this longer-run international series, we cannot reject the null hypothesis of no linear relationship between inflation and unemployment. Visually, this matches Figure 2, where the cloud of points is widely scattered with no clear upward or downward slope. Taken together, the two correlation tests suggest that the presence of a Phillips-curve-type pattern is sensitive to the choice of inflation measure and to the time horizon we consider.
 
-To move beyond simple correlations, we also estimate a log–log regression model using the FRED data, regressing the logarithm of inflation on the logarithm of unemployment. The estimated coefficient on log unemployment is positive and highly statistically significant, with a p-value on the order of 10⁻¹⁴, indicating a robust association between the two variables even after rescaling them. At the same time, the model’s R-squared is only about 0.06, meaning that changes in unemployment alone explain a relatively small share of the overall variation in inflation. This combination of a highly significant slope but a low R-squared highlights an important feature of macroeconomic data: unemployment is clearly related to inflation, but many other factors, such as supply shocks or monetary policy, also influence inflation dynamics and are not captured by our simple one-regressor specification.
+To move beyond simple correlations, we also estimate a log–log regression model using the FRED data, regressing the logarithm of inflation on the logarithm of unemployment. The estimated coefficient on log unemployment is positive and highly statistically significant, with a p-value on the order of 10^-14, indicating a robust association between the two variables even after rescaling them. At the same time, the model’s R-squared is only about 0.06, meaning that changes in unemployment alone explain a relatively small share of the overall variation in inflation. This combination of a highly significant slope but a low R-squared highlights an important feature of macroeconomic data: unemployment is clearly related to inflation, but many other factors, such as supply shocks or monetary policy, also influence inflation dynamics and are not captured by our simple one-regressor specification.
 
-Finally, by examining the unemployment series from FRED and the World Bank over time, we see that spikes in unemployment tend to occur around major macroeconomic events such as recessions. The fact that both data sources track each other closely over these episodes, as shown in Figure 3, supports the reliability of our unemployment measures and suggests that the differences in our results are driven more by the inflation series than by inconsistencies in unemployment data. At the same time, these time plots also suggest that the relationship between inflation and unemployment may vary across periods, for example between crisis and non-crisis years. While we do not formally estimate a time-varying model in this project, our findings are consistent with the modern view that a Phillips-curve-like trade-off can be visible in certain short-run windows but is not a stable, long-run structural relationship.
+By examining the unemployment series from FRED and the World Bank over time, we see that spikes in unemployment tend to occur around major macroeconomic events such as recessions. The fact that both data sources track each other closely over these episodes, as shown in Figure 3, supports the reliability of our unemployment measures and suggests that the differences in our results are driven more by the inflation series than by inconsistencies in unemployment data. At the same time, these time plots also suggest that the relationship between inflation and unemployment may vary across periods, for example between crisis and non-crisis years. While we do not formally estimate a time-varying model in this project, our findings are consistent with the modern view that a Phillips curve like trade off can be visible in certain short-run windows but is not a stable, long-run structural relationship.
+
+For the CPI by educational degree, the unemployment rate of the high school education is naturally higher than the bachelors, so all data used was normalized via min-max method, to place the high school and bachelor's unemployment levels on the same scale. 
+
+```{r, echo=FALSE}
+source("Scripts/22_min_max.R")
+
+min_max_unem <- unem_percent[1:338,]#exclude covid/post-covid, causes massive outliers if left in
+min_max_unem$BS_unem <- min_max(min_max_unem$BS_unem)
+min_max_unem$HS_unem <- min_max(min_max_unem$HS_unem)
+min_max_unem$CPI_min_max <- min_max(min_max_unem$CPI_sticky)
+
+ggplot(data = min_max_unem, aes(x = observation_date)) +
+  geom_line(aes(y = HS_unem, colour = "Unemployment of HS degree")) +
+  geom_line(aes(y = BS_unem, colour = "Unemployment of BS degree")) +
+  geom_line(aes(y = CPI_min_max, colour = "CPI")) +
+  guides(color = guide_legend(title = "")) +
+  ylim(0,1)+
+  labs(title = "CPI, BS and HS degree over time",
+      x = "Observation Date",
+      y = "Min-Max Normalized value from 0 - 1 "
+      )
+```
+When compared against one another, the CPI clearly has large shifts in its value whenever there are large spikes in the unemployment rate. 
+
+```{r, echo=FALSE}
+ggplot(data = min_max_unem, aes(x = CPI_min_max)) +
+geom_smooth(aes(colour = "High school Unemployment", y = HS_unem )) +
+  geom_smooth(aes(y = BS_unem, colour = "Bachelors Unemployment")) +
+  geom_point(aes(y = HS_unem, colour = "High school Unemployment")) +
+  geom_point(aes(y = BS_unem, colour = "Bachelors Unemployment")) +
+  labs(y = "Unemployment rate",
+       x = "CPI",
+       title = "UR by CPI yearly change, Normalized via min-max"
+       )
+```
+
+Plotting UR against the CPI change shows a U-shape, where unemployment rate of both education levels increase the farther they are from 0.5. This is entirely expected, as the natural rate of inflation is 2%, and the 0.5 mark of the normalized CPI is approximately 2, making the center of the graph a healthy range for inflation to be at. 
+While the high school level appears to have a marginally higher rate of unemployment when the CPI is higher, the rate of unemployment between bachelors and high school levels is otherwise almost the same, sharing almost identical lines of best fit and distributions. 
+
+As this is clearly not a simple linear relationship, the regression model uses a polynomial relationship. Higher order polynomials do offer higher R-squared values and better residual plots, but we wanted to avoid overfitting the model. 
+The R-squared is low, at 0.46, showing that, while CPI is an indicator of unemployment, it is an unreliable one, and will not give precise results.
+
+The diagnostics have similar flaws across the board, for both high school and bachelor's levels. This matches with their near-identical distributions on the UR-CPI graph above.
+The residual plot shows a clear slant, albeit shallow, alongside clustering towards x = 0, indicating that there are some outliers in the dataset. 
+The QQ plot is generally fairly straight, but the ends do curve upwards slightly, indicating a right skew in the data.
+The scale-location and leverage plots are at least evenly distributed around the center line, alongside all data points remaining within Cook's distance. The long tails indicate a right skew in the data as well. 
+
+```{r, echo=FALSE}
+min_max_HS <- lm(data = min_max_unem, HS_unem ~ poly(CPI_min_max,2))
+summary(min_max_HS)
+```
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2))
+plot(min_max_HS)
+```
+
+
+```{r, echo=FALSE}
+min_max_BS <- lm(data = min_max_unem, BS_unem ~ poly(CPI_sticky,2))
+summary(min_max_BS)
+```
+
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2))
+plot(min_max_BS)
+```
+
+The second part of this dataset was to see if the unemployment rate of the two education levels had any significant difference between one another, specifically during economic crises. For this, we used a two sided t-test with the defined time periods of 2001 and 2008. 
+With the standard P-value of 0.05, there is a significant difference between these two, but the amount is minuscule, with the bachelor's level having a barely smaller relative unemployment rate of 0.035.
+
+```{r, echo=FALSE}
+test <- c(109:120, 193:211) # specifically 2001 and 2008
+t.test(min_max_unem[test, ]$BS_unem, min_max_unem[test, ]$HS_unem, paired = TRUE)
+```
+
 
 Conclusions
 
 In this project, we investigated the relationship between inflation and unemployment using two different data sources and several simple statistical tools. Our main goal was to see whether the empirical patterns in recent data resemble the short-run Phillips curve, which predicts an inverse relationship between inflation and unemployment.
 
-For the FRED data, the correlation between 10-year breakeven inflation and unemployment is strongly negative (about −0.87, with a 95% confidence interval that does not include zero and a p-value around 0.02). This means that, in the periods we observe, higher expected inflation is associated with lower unemployment, consistent with the idea of a downward-sloping short-run Phillips curve. In contrast, the World Bank data on CPI inflation and unemployment show a very weak and statistically insignificant correlation (around 0.08 with a large p-value), suggesting that when we look at a longer span of annual data and a broader international context, the inflation–unemployment trade-off is much less clear.
+For the FRED data, the correlation between 10-year breakeven inflation and unemployment is strongly negative (about -0.87, with a 95% confidence interval that does not include zero and a p-value around 0.02). This means that, in the periods we observe, higher expected inflation is associated with lower unemployment, consistent with the idea of a downward-sloping short-run Phillips curve. In contrast, the World Bank data on CPI inflation and unemployment show a very weak and statistically insignificant correlation (around 0.08 with a large p-value), suggesting that when we look at a longer span of annual data and a broader international context, the inflation–unemployment trade-off is much less clear.
 
 The log–log regression using FRED data further supports the existence of a statistically significant relationship between unemployment and inflation: the slope coefficient on log unemployment is positive and highly significant. However, the R-squared of the model is only about 0.06, meaning that unemployment explains only a small fraction of the variation in inflation. This indicates that, although unemployment is related to inflation in the short run, many other macroeconomic factors also play important roles in determining inflation dynamics.
+
+The polynomial model with the percent CPI change appears to explain the relationship between inflation and unemployment better. The U-shaped curve showcases how fluctuations away from 2% in the rate of inflation, both upwards and downwards, signals a weakened economy. With R-squared values of 0.46 and 0.48, inflation rates do have some predictive power over unemployment, but there are likely more predictors of unemployment rate. 
+Educational attainment showed a minuscule, albeit significant effect on relative unemployment rates, though this small difference could likely be sampling randomness. 
 
 Overall, our results suggest that the Phillips-curve-like trade-off between inflation and unemployment can be detected in certain short-run, country-specific data (such as the FRED series for the United States), but it becomes much weaker or disappears when looking at broader and longer-run data such as the World Bank series. This is consistent with the modern view that the Phillips curve may hold in the short run under specific conditions, but is not a stable, structural relationship in the long run. Our analysis is also limited by the small sample size for some series, by measurement differences across data sources, and by the simple models we use. Future work could extend this project by including more macroeconomic variables, splitting the sample into different time periods, or applying more advanced modeling techniques to better capture time-varying relationships between inflation and unemployment.

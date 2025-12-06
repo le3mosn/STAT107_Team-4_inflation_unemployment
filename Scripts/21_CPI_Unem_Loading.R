@@ -1,8 +1,6 @@
 BS_unemployment <- read.csv("data/bachelors_unemployment.csv")
 HS_unemployment <- read.csv("data/HS_and_under_unemployment.csv")
 raw_CPI <- read.csv("data/CPI_sticky.csv")[289:693,]
-all_unemployment <- read.csv("data/UNRATE_general.csv")
-raw_CPI_long <- read.csv("data/CPI_sticky.csv")
 
 #combine the above into one dataframe
 
