@@ -1,0 +1,110 @@
+---
+title: "CPI"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+source("Scripts/00_requirements.R")
+source("Scripts/01_data_load.R")
+```
+# With CPI against Unemployment rate 
+The two purposes of this comparison was to see if there was a relationship between CPI and unemployment rates, and to see if education level caused different unemployment rates during economic crises.  
+
+## Basic visualization 
+The CPI used here is in percent change from the previous year, rather than the its raw value. Due to the natural rate of inflation, the CPI constantly increases. Using yearly percent change makes it easier to spot significant changes in the value of the CPI. 
+
+```{r, echo=FALSE}
+source("Scripts/21_CPI_Unem_Loading.R")
+
+ggplot(data = unem_percent, aes(x = observation_date)) +
+  geom_line(aes(y = BS_unem, colour = "BS Degree and up")) +
+  geom_line(aes(y = HS_unem, colour = "HS Degree and up")) +
+  geom_line(aes(y = CPI_sticky, colour = "CPI, % change from last year")) +
+  ylim(0,20) +
+  labs(x = "Observation Date",
+       y = "",
+       caption = "Note the changes in CPI during spikes of unemloyment.",
+       color = "",
+       title = "Unemployment by Education level & Yearly Percent Change of CPI") +
+  theme( plot.caption = element_text(hjust = 0.5))
+```
+
+## Excluded Data
+Of particular note is the spikes after 2020. The COVID-19 shutdown and its following recovery was a unique situation, and this dataset lacks any other similar events. While it is an interesting topic, this project focuses on general trends of the economy. For this reason, the COVID-19 period (2020-onwards) will be excluded. 
+
+# Data analysis 
+The unemployment rate of the high school education is naturally higher than the bachelors, so all data used was normalized via min-max method, to place the high school and bachelor's unemployment levels on the same scale. 
+
+```{r, echo=FALSE}
+source("Scripts/22_min_max.R")
+
+min_max_unem <- unem_percent[1:338,]#exclude covid/post-covid, causes massive outliers if left in
+min_max_unem$BS_unem <- min_max(min_max_unem$BS_unem)
+min_max_unem$HS_unem <- min_max(min_max_unem$HS_unem)
+min_max_unem$CPI_min_max <- min_max(min_max_unem$CPI_sticky)
+
+ggplot(data = min_max_unem, aes(x = observation_date)) +
+  geom_line(aes(y = HS_unem, colour = "Unemployment of HS degree")) +
+  geom_line(aes(y = BS_unem, colour = "Unemployment of BS degree")) +
+  geom_line(aes(y = CPI_min_max, colour = "CPI")) +
+  guides(color = guide_legend(title = "")) +
+  
+  ylim(0,1)
+```
+
+
+# CPI as a Predictor for Unemployment
+
+Plotting UR against the CPI change shows a U-shape, where unemployment rate of both education levels increase the farther they are from 0.5. This is entirely expected, as the natural rate of inflation is 2%, and the 0.5 mark of the normalized CPI is approximately 2, making the center of the graph a healthy range for inflation to be at. 
+While the high school level appears to have a marginally higher rate of unemployment when the CPI is higher, the rate of unemployment between bachelors and high school levels is otherwise almost the same, sharing almost identical lines of best fit and distributions. 
+```{r, echo=FALSE}
+ggplot(data = min_max_unem, aes(x = CPI_min_max)) +
+geom_smooth(aes(colour = "High school Unemployment", y = HS_unem )) +
+  geom_smooth(aes(y = BS_unem, colour = "Bachelors Unemployment")) +
+  geom_point(aes(y = HS_unem, colour = "High school Unemployment")) +
+  geom_point(aes(y = BS_unem, colour = "Bachelors Unemployment")) +
+  labs(y = "Unemployment rate",
+       x = "CPI",
+       title = "UR by CPI yearly change, Normalized via min-max"
+       )
+```
+
+As this is clearly not a simple linear relationship, the regression model uses a polynomial relationship. Higher order polynomials do offer higher R-squared values and better residual plots, but we wanted to avoid overfitting the model. 
+The R-squared is low, at 0.46, showing that, while CPI is an indicator of unemployment, it is an unreliable one, and will not give precise results.
+
+The diagnostics have similar flaws across the board, for both high school and bachelor's levels. This matches with their near-identical distributions on the UR-CPI graph above.
+The residual plot shows a clear slant, albeit shallow, alongside clustering towards x = 0, indicating that there are some outliers in the dataset. 
+The QQ plot is generally fairly straight, but the ends do curve upwards slightly, indicating a right skew in the data.
+The scale-location and leverage plots are at least evenly distributed around the center line, alongside all data points remaining within Cook's distance. The long tails indicate a right skew in the data as well. 
+
+```{r, echo=FALSE}
+min_max_HS <- lm(data = min_max_unem, HS_unem ~ poly(CPI_min_max,2))
+summary(min_max_HS)
+```
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2))
+plot(min_max_HS)
+```
+
+
+```{r, echo=FALSE}
+min_max_BS <- lm(data = min_max_unem, BS_unem ~ poly(CPI_sticky,2))
+summary(min_max_BS)
+```
+
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2))
+plot(min_max_BS)
+```
+# Differences between High school and Bachelor's degrees
+
+The second part of this was to see if the unemployment rate of the two education levels had any significant difference between one another, specifically during economic crises. For this, we used a two sided t-test with the time periods of 2001 and 2008. 
+With the standard P-value of 0.05, there is a significant difference between these two, but the amount is minuscule, with the bachelor's level having a barely smaller relative unemployment rate of 0.035.
+
+```{r, echo=FALSE}
+test <- c(109:120, 193:211) # specifically 2001 and 2008
+t.test(min_max_unem[test, ]$BS_unem, min_max_unem[test, ]$HS_unem, paired = TRUE)
+```
