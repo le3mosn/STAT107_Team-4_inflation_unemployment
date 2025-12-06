@@ -1,6 +1,6 @@
 ---
 title: "Correlation between Inflation and Unemployment"
-author: "Edison, Yamato, Vincent"
+author: " Edison Jiang, Vincent Chau, Yamato Lchii"
 date: 2025/11/07
 output:
   pdf_document:
